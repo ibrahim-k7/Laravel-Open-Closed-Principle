@@ -1,8 +1,8 @@
 <?php 
 
-namespace App\Open_Closed_Principle;
+namespace App\OpenClosedPrinciple;
 
-class Rectangle {
+class Rectangle implements ShapeInterface{
     public $width;
     public $height;
 
@@ -10,5 +10,9 @@ class Rectangle {
     {
         $this->width = $width;
         $this->height = $height;
+    }
+    public function area()
+    {
+        return $this->width * $this->height;
     }
 }

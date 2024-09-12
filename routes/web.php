@@ -1,18 +1,13 @@
 <?php
 
+use App\OpenClosedPrinciple\AreaCalculator;
+use App\OpenClosedPrinciple\Circle;
+use App\OpenClosedPrinciple\Rectangle;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
-*/
-
 Route::get('/', function () {
-    return view('welcome');
+    return (new AreaCalculator())->totalArea(
+        new Rectangle(10,20),
+        new Circle(10),
+    );
 });

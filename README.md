@@ -1,66 +1,140 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## Open Closed Principle
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The **Open/Closed Principle (OCP)** is one of the Object-Oriented Programming (OOP) principles and it deals with designing code in a way that makes it **open for extension** and **closed for modification**. In other words, classes or objects should be extendable without needing to modify the existing code.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Example: Calculate the area of ​​a shape
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+In the following example, we will create a class called `Rectangle` which contains:
 
-## Learning Laravel
+```php
+namespace App\OpenClosedPrinciple;
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+class Rectangle {
+    public $width;
+    public $height;
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+    public function __construct($width,$height)
+    {
+        $this->width = $width;
+        $this->height = $height;
+    }
+}
+```
+And here we create a class called `AreaCalculator` to calculate the area, which contains:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```php
+namespace App\OpenClosedPrinciple;
 
-## Laravel Sponsors
+class AreaCalculator
+{
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+    public function totalArea(array $rectangle)
+    {
+        $area = 0;
+        foreach ($rectangle as $rectangle) {
+            $area += $rectangle->width * $rectangle->height;
+        }
 
-### Premium Partners
+        return $area;
+    }
+}
+```
+Here A new instance of AreaCalculator is created and its totalArea() method is called. An array containing a single Rectangle object with a width of 10 and a height of 20 is passed to it. The totalArea() method calculates the total area and returns the result.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```php
+use App\OpenClosedPrinciple\AreaCalculator;
+use App\OpenClosedPrinciple\Rectangle;
+use Illuminate\Support\Facades\Route;
 
-## Contributing
+Route::get('/', function () {
+    return (new AreaCalculator())->totalArea([
+        new Rectangle(10,20),
+    ]);
+});
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
 
-## Code of Conduct
+**The result will be 200**
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+After some time, a new requirement was added: calculating the area for a circle as well. Modifying the existing code to accommodate this would violate the Open/Closed Principle. The solution is use Open/Closed Principle
 
-## Security Vulnerabilities
+### Refactoring to Follow OCP
+1. **Create an interface named ShapeInterface**:
+   It contains one function called area.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    ```php
+    interface ShapeInterface {
+     public function area();
+    }
+   ```
 
-## License
+2. **Implement the interface**:
+    Implement the interface on the shapes, add the area function, and write its logic..
+   ```php
+    class Rectangle implements ShapeInterface{
+        public $width;
+        public $height;
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+        public function __construct($width,$height)
+        {
+            $this->width = $width;
+            $this->height = $height;
+        }
+        public function area()
+        {
+            return $this->width * $this->height;
+        }
+    }
+   ```
+
+3. **Edit AreaCalculation class**:
+    Change the variable name from $rectangle to $shapes And modify the logic, And using the Spread Operator to check if the parameter is an instance of `ShapeInterface`.
+
+   ```php
+   class AreaCalculator
+    {
+        public function totalArea(ShapeInterface ...$shapes)
+        {
+            $area = 0;
+            foreach ($shapes as $shapes) {
+                $area += $shapes->area();
+            }
+            return $area;
+        }
+    }
+   ```
+
+4. **Create a new shape class**:
+    Create a new shape class whose area is to be calculated. Let's assume that it is a circle.
+
+     ```php
+        class Circle implements ShapeInterface{
+        public $radius;
+
+        public function __construct($radius)
+        {
+            $this->radius = $radius;
+        }
+
+        public function area()
+        {
+            return $this->radius * $this->radius * pi(); 
+        }
+    }
+     ```
+
+5. **web.php**:
+
+     ```php
+    Route::get('/', function () {
+        return (new AreaCalculator())->totalArea(
+            new Rectangle(10,20),
+            new Circle(10),
+        );
+    });
+     ```
+
+--- 
